@@ -1,38 +1,36 @@
-function validarCPF(cpf) {
-  let cpfLimpo = cpf.replace(/\D+/g, '');
-  let cpfArray = cpfLimpo.split('');
-  cpfArray.pop();
-  cpfArray.pop();
-  let cpfFormatado = [];
-  let numero = 10;
-  cpfArray.forEach((el) => {
-    cpfFormatado.push(el * numero);
-    numero--;
-  });
-  cpfFormatado = cpfFormatado.reduce((acumulador, elemento) => {
-    return acumulador + elemento;
-  }, 0);
-
-  let primeiroDigito =
-    11 - (cpfFormatado % 11) > 9 ? 0 : 11 - (cpfFormatado % 11);
-  cpfArray.push(primeiroDigito);
-  let novonumero = 11;
-  let novoCpfFormatado = [];
-  cpfArray.forEach((el) => {
-    novoCpfFormatado.push(el * novonumero);
-    novonumero--;
-  });
-
-  novoCpfFormatado = novoCpfFormatado.reduce((acumulador, elemento) => {
-    return acumulador + elemento;
-  }, 0);
-  let segundoDigito =
-    11 - (novoCpfFormatado % 11) > 9 ? 0 : 11 - (novoCpfFormatado % 11);
-
-  cpfArray.push(segundoDigito);
-
-  return cpfLimpo == cpfArray.join('');
+function ValidaCPF(cpf) {
+  this.cpfLimpo = cpf.replace(/\D+/g, '');
+  this.cpfArray = this.cpfLimpo.slice(0, -2).split('');
 }
 
-const cpf = '147.452.527-06';
-console.log(validarCPF(cpf));
+ValidaCPF.prototype.issValid = function () {
+  let numero = 10;
+  let primeiroDigito = this.cpfArray.reduce((acumulador, elemento) => {
+    acumulador += numero * Number(elemento);
+    numero--;
+    return acumulador;
+  }, 0);
+
+  primeiroDigito = 11 - (primeiroDigito % 11);
+  primeiroDigito = primeiroDigito > 9 ? 0 : primeiroDigito;
+  this.cpfArray.push(String(primeiroDigito));
+
+  let novoNumero = 11;
+  let segundoDigito = this.cpfArray.reduce((acumulador, elemento) => {
+    acumulador += novoNumero * Number(elemento);
+    novoNumero--;
+    return acumulador;
+  }, 0);
+
+  segundoDigito = 11 - (segundoDigito % 11);
+  segundoDigito = segundoDigito > 9 ? 0 : segundoDigito;
+  this.cpfArray.push(String(segundoDigito));
+
+  let cpfValidado = this.cpfArray.join('');
+  let isValid = cpfValidado === this.cpfLimpo;
+
+  return isValid;
+};
+const cpf = new ValidaCPF('111.111.111-11');
+
+console.log(cpf.issValid());
